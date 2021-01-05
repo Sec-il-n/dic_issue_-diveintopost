@@ -15,4 +15,7 @@ class Team < ApplicationRecord
   def invite_member(user)
     assigns.create(user: user)
   end
+  def change_owner(user_id)
+    team.update(owner_id: user_id)
+  end
 end

@@ -1,6 +1,7 @@
 class TeamsController < ApplicationController
+  include TeamHelper
   before_action :authenticate_user!
-  before_action :set_team, only: %i[show edit update destroy]
+  before_action :set_team, only: %i[show edit update destroy update_owner]
 
   def index
     @teams = Team.all
@@ -15,7 +16,7 @@ class TeamsController < ApplicationController
     @team = Team.new
   end
 
-  def edit; end
+  def edit ; end
 
   def create
     @team = Team.new(team_params)
@@ -38,6 +39,17 @@ class TeamsController < ApplicationController
     end
   end
 
+  def update_owner
+    @user = User.find_by(id: params[:owner])
+
+    if owner?(@team) && @user
+      if @team.update(owner_id: @user.id)
+        OwnerChangedMailer.owner_changed(@user).deliver!
+        redirect_to team_path
+      end
+    end
+  end
+
   def destroy
     @team.destroy
     redirect_to teams_url, notice: I18n.t('views.messages.delete_team')
@@ -56,4 +68,5 @@ class TeamsController < ApplicationController
   def team_params
     params.fetch(:team, {}).permit %i[name icon icon_cache owner_id keep_team_id]
   end
+
 end
