@@ -1,4 +1,5 @@
 class TeamsController < ApplicationController
+  include AssignHelper
   before_action :authenticate_user!
   before_action :set_team, only: %i[show edit update destroy]
 
@@ -30,7 +31,7 @@ class TeamsController < ApplicationController
   end
 
   def update
-    if @team.update(team_params)
+    if owner?(@team) && @team.update(team_params)
       redirect_to @team, notice: I18n.t('views.messages.update_team')
     else
       flash.now[:error] = I18n.t('views.messages.failed_to_save_team')
