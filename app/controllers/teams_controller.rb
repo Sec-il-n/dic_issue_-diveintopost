@@ -41,8 +41,8 @@ class TeamsController < ApplicationController
 
   def update_owner
     @user = User.find_by(id: params[:owner])
-
-    if owner?(@team) && @user
+    
+    if team_owner?(@team) && @user
       if @team.update(owner_id: @user.id)
         OwnerChangedMailer.owner_changed(@user).deliver!
         redirect_to team_path
