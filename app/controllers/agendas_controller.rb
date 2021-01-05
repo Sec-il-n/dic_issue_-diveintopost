@@ -21,12 +21,15 @@ class AgendasController < ApplicationController
     end
   end
   def destroy
+    binding.pry
     if owner_or_author?(@agenda)
       @agenda_title = @agenda.title
+
       if @agenda.destroy
-        users = @agenda.team.users
-        DeletedAnnounceMailer.deleted_announce_mailer(users, @agenda.title).deliver
-        
+        @users = @agenda.team.users
+        @users.each do |user|
+          DeletedAnnounceMailer.deleted_announce_mailer(user, @agenda.title).deliver
+        end
         redirect_to dashboard_path
       end
     end
